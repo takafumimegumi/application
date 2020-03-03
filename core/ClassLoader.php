@@ -5,7 +5,7 @@ class ClassLoader {
 	protected $dirs;
 
 	public function register() {
-		spl_autoload_register([$this, 'loadClass'));
+		spl_autoload_register([$this, 'loadClass']);
 	}
 
 	public function registerDir($dir) {
