@@ -76,19 +76,23 @@ abstract class Application {
     }
 
     public function run() {
-        //（例）$params = ['controller' => 'user', 'action' => 'edit']
-        $params = $this->router->resolve($this->request->getPathInfo());
-        if ($params === false) {
-            // todo-A
+        try {
+            //（例）$params = ['controller' => 'user', 'action' => 'edit']
+            $params = $this->router->resolve($this->request->getPathInfo());
+            if ($params === false) {
+                throw new HttpNotFoundException('No route found for ' . $this->request->getPathInfo());
+            }
+
+            //（例）user
+            $controller = $params['controller'];
+            //（例）edit
+            $action = $params['action'];
+
+            //（例）Application::runAction('user', 'edit', ['controller' => 'user', 'action' => 'edit']);
+            $this->runAction($controller, $action, $params);
+        } catch (HttpNotFoundException $e) {
+            $this->render404Page($e);
         }
-
-        //（例）user
-        $controller = $params['controller'];
-        //（例）edit
-        $action = $params['action'];
-
-        //（例）Application::runAction('user', 'edit', ['controller' => 'user', 'action' => 'edit']);
-        $this->runAction($controller, $action, $params);
 
         $this->response->send();
     }
@@ -101,7 +105,7 @@ abstract class Application {
         $controller = $this->findController($controller_class);
         // コントローラが見つからなかった場合
         if ($controller === false) {
-            // todo-B
+            throw new HttpNotFoundException($controller_class . ' controller is not found.');
         }
 
         //（例）UserController->run('edit', ['controller' => 'user', 'action' => 'edit']);
@@ -128,8 +132,29 @@ abstract class Application {
             }
         }
 
-        //（例）new UserController(Applicationクラス自身)
+        //（例）new UserController(Applicationクラス自身) ← これによりControllerクラス内でApplicationクラスの各メソッドを扱える
         return new $controller_class($this);
+    }
+
+    protected function render404Page($e) {
+        $this->response->setStatusCode(404, 'Not Found');
+        $message = $this->isDebugMode() ? $e->getMessage() : 'Page not found.';
+        $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
+
+        $this->response->setContent(<<<EOF
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>404</title>
+</head>
+<body>
+        {$message}
+</body>
+</html>
+EOF
+        );
     }
 
 }
