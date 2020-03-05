@@ -60,8 +60,8 @@ class Request {
 		$base_url = $this->getBaseUrl();
 		$request_uri = $this->getRequestUri();
 
-		// GETメソッドが含まれている場合の処理（$posに0以外が代入されたとき）
-		if (false !== ($pos = strpost($request_uri, '?'))) {
+		// GETパラメータが含まれている場合の処理（$posに0以外が代入されたとき）
+		if (false !== ($pos = strpos($request_uri, '?'))) {
 			$request_uri = substr($request_uri, 0, $pos); // GETパラメータ(?~の部分)を取り除く
 		}
 

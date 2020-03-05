@@ -9,7 +9,7 @@ class Session {
         if (!self::$sessionStarted) {
             session_start();
 
-            self::sessionStarted = true;
+            self::$sessionStarted = true;
         }
     }
 
