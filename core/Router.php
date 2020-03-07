@@ -12,7 +12,7 @@ class Router {
         $routes = [];
 
         foreach ($definitions as $url => $params) {
-            // （例）'/item/:action' → [item, :action]
+            // （例）'/account/:action' → [account, :action]
             $tokens = explode('/', ltrim($url, '/'));
             foreach ($tokens as $i => $token) {
                 // 動的パラメータである場合（例）:action
@@ -22,7 +22,7 @@ class Router {
                     // 正規表現の形式に変換（名前付きキャプチャ）
                     $token = '(?P<' . $name . '>[^/]+)';
                 }
-                // （例）'/item/:action' → [item, (?P<action>[^/]+)]
+                // （例）'/account/:action' → [account, (?P<action>[^/]+)]
                 $tokens[$i] = $token;
             }
             // 正規表現のパターンを生成
@@ -43,9 +43,9 @@ class Router {
 
         foreach ($this->routes as $pattern => $params) {
             // $routesプロパティに格納されたルーティング定義配列を利用して正規表現のパターンを完成させ、preg_match関数でマッチングを行う
-            // （パターン例）#^/item/(?P<action>[^/]+)$#
+            // （パターン例）#^/account/(?P<action>[^/]+)$#
             if (preg_match('#^' . $pattern . '$#', $path_info, $matches)) {
-                // （例）['controller' => 'item'] → ['controller' => 'item', <マッチした文字列> ,'action' => <括弧で囲まれた値>, <括弧で囲まれた値>]
+                // （例）['controller' => 'account'] → ['controller' => 'account', <マッチした文字列> ,'action' => <括弧で囲まれた値>, <括弧で囲まれた値>]
                 $params = array_merge($params, $matches);
 
                 return $params;

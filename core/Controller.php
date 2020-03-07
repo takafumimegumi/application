@@ -11,7 +11,7 @@ abstract class Controller {
     protected $db_manager;
 
     public function __construct($application) {
-        //（例）'UserCntoroller' → 'user'
+        //（例）'AccountContoroller' → 'account'
         $this->controller_name = strtolower(substr(get_class($this), 0, -10));
 
         $this->application = $application;
@@ -22,14 +22,17 @@ abstract class Controller {
     }
 
     public function run($action, $params = []) {
+        //（例）signup
         $this->action_name = $action;
 
+        //（例）signupAction
         $action_method = $action . 'Action';
         if (!method_exists($this, $action_method)) {
             $this->forward404();
         }
 
         // 可変関数の仕組みを使ってアクションを特定し、存在すれば実行
+        //（例）AccountController::signupAction
         $content = $this->$action_method($params);
 
         return $content;

@@ -77,18 +77,18 @@ abstract class Application {
 
     public function run() {
         try {
-            //（例）$params = ['controller' => 'user', 'action' => 'edit']
+            //（例）$params = ['controller' => 'account', 'action' => 'signup']
             $params = $this->router->resolve($this->request->getPathInfo());
             if ($params === false) {
                 throw new HttpNotFoundException('No route found for ' . $this->request->getPathInfo());
             }
 
-            //（例）user
+            //（例）account
             $controller = $params['controller'];
-            //（例）edit
+            //（例）signup
             $action = $params['action'];
 
-            //（例）Application::runAction('user', 'edit', ['controller' => 'user', 'action' => 'edit']);
+            //（例）Application::runAction('account', 'signup', ['controller' => 'account', 'action' => 'signup']);
             $this->runAction($controller, $action, $params);
         } catch (HttpNotFoundException $e) {
             $this->render404Page($e);
@@ -98,7 +98,7 @@ abstract class Application {
     }
 
     public function runAction($controller_name, $action, $params = []) {
-        // 第一引数の文字列の最初の文字を大文字にし、連結する（例）UserController
+        // 第一引数の文字列の最初の文字を大文字にし、連結する（例）AccountController
         $controller_class = ucfirst($controller_name) . 'Controller';
 
         // コントローラが特定できたらインスタンス化して返す
@@ -108,7 +108,7 @@ abstract class Application {
             throw new HttpNotFoundException($controller_class . ' controller is not found.');
         }
 
-        //（例）UserController->run('edit', ['controller' => 'user', 'action' => 'edit']);
+        //（例）AccountController->run('signup', ['controller' => 'account', 'action' => 'signup']);
         // runメソッドを実行して帰ってきたコンテンツを取得
         $content = $controller->run($action, $params);
         // Response::setContentで、コントローラのrunメソッドによる返り値(コンテンツ)をメッセージボディーにセット
@@ -132,7 +132,7 @@ abstract class Application {
             }
         }
 
-        //（例）new UserController(Applicationクラス自身) ← これによりControllerクラス内でApplicationクラスの各メソッドを扱える
+        //（例）new AccountController(Applicationクラス自身) ← これによりControllerクラス内でApplicationクラスの各メソッドを扱える
         return new $controller_class($this);
     }
 
