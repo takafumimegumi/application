@@ -79,4 +79,35 @@ abstract class Controller {
         $this->response->setHttpHeader('Location', $url);
     }
 
+
+    protected function generateCsrfToken($form_name) {
+        $key = 'csrf_tokens/' . $form_name;
+        // セッションを連想配列で取得（キーが$key）
+        $tokens = $this->session->get($key, []);
+        // トークンが10個以上ある場合は、古いものから削除
+        if (count($tokens) >= 10) {
+            array_shift($tokens);
+        }
+
+        $token = sha1($form_name . session_id() . microtime());
+        $tokens[] = $token;
+
+        $this->session->set($key, $tokens);
+
+        return $token;
+    }
+
+    protected function checkCsrfToken($form_name, $token) {
+        $key = 'csrf_tokens/' . $form_name;
+        $tokens = $this->session->get($key, []);
+
+        // 指定した値を配列で検索し見つかって、キーを返ってきた場合の処理
+        if (false !== ($pos = array_search($token, $tokens, true))) {
+            unset($token[$pos]);
+            $this->session->set($key, $tokens);
+
+            return true;
+        }
+    }
+
 }
