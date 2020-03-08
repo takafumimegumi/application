@@ -60,4 +60,23 @@ abstract class Controller {
         return $view->render($path, $variables, $layout);
     }
 
+    protected function forward404() {
+        throw new HttpNotFoundException('Forwarded 404 page from ' . $this->controller_name . '/' . $this->action_name);
+    }
+
+    protected function redirect($url) {
+        // 同じアプリケーション内で別アクションのリダイレクトを行う場合の処理（$urlにはPATH_INFO部分のみ指定）
+        if (!preg_match('#https?://#', $url)) {
+            $protocol = $this->request->isSsl() ? 'https://' : 'http://';
+            $host = $this->request->getHost();
+            $base_url = $this->request->getBaseUrl();
+
+            // 絶対URLの組み立て
+            $url = $protocol . $host . $base_url . $url;
+        }
+
+        $this->response->setStatuscode(302, 'Found');
+        $this->response->setHttpHeader('Location', $url);
+    }
+
 }
