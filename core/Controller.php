@@ -38,4 +38,26 @@ abstract class Controller {
         return $content;
     }
 
+    // ビューファイルの読み込み処理をラッピングしたメソッド
+    protected function render($variables = [], $template = null, $layout = 'layout') {
+        $defaults = [
+            'request' => $this->request,
+            'base_url' => $this->request->getBaseUrl(),
+            'session' => $this->session,
+        ];
+
+        $view = new View($this->application->getViewDir(), $defaults);
+
+        if (is_null($template)) {
+            //（例）signup
+            $template = $this->action_name;
+        }
+
+        //（例）account/signup
+        $path = $this->controller_name . '/' . $template;
+
+        //（例）$view->render('acount/signup', [], 'layout');
+        return $view->render($path, $variables, $layout);
+    }
+
 }
