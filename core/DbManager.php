@@ -6,8 +6,10 @@ class DbManager {
     protected $repository_connection_map = [];
     protected $repositories = [];
 
+    // 接続を行うメソッド（$nameは接続を特定するための名前：masterなど）
     public function connect($name, $params) {
 
+        // 各キーが存在するかのチェックを不要にするためにarray_merge関数を利用
         $params = array_merge([
             'dsn' => null,
             'user' => '',
@@ -53,19 +55,22 @@ class DbManager {
         return $con;
     }
 
+    // Repositoryクラスの管理を行うメソッド
     public function get($repository_name) {
         if (!isset($this->repositories[$repository_name])) {
             //（例）get('User') → $repository_class = 'UserRepository'
             $repository_class = $repository_name. 'Repository';
             //（例）get('User') → $con = getConnectionForRepository('User');
-            // repository_connection_map['User']の値が$conに代入される
-            // 値が設定されていない場合は最初に作成した接続先（mysqlなどの接続情報が入力済みのPDOインスタンス）を取得する
+            // repository_connection_map['User']の値（$name）が$conに代入される
+            // 値（$name）が設定されていない場合は最初に作成した接続先（mysqlなどの接続情報が入力済みのPDOインスタンス）を取得する
             $con = $this->getConnectionForRepository($repository_name);
 
             // new UserRepository(PDOクラスのインスタンス)
             $repository = new $repository_class($con);
 
-            // repositories['User'] = UserRepository(PDOクラスのインスタンス)のインスタンス
+            // repositories = [
+            //     'User' => UserRepository(PDOクラスのインスタンス)のインスタンス
+            // ];
             $this->repositories[$repository_name] = $repository;
         }
 

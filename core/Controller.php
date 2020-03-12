@@ -102,6 +102,11 @@ abstract class Controller {
     protected function generateCsrfToken($form_name) {
         $key = 'csrf_tokens/' . $form_name;
         // セッションを連想配列で取得（キーが$key）
+        // $tokens = [
+        //     'sakdjfjaskljdlkjasjdfjaskfdjkasjfdfkjasljdf',
+        //     'jdklfjalkjskdjfklajklsdjflkjakjsdlkjdlkfjal',
+        //     '...'
+        // ];
         $tokens = $this->session->get($key, []);
         // トークンが10個以上ある場合は、古いものから削除
         if (count($tokens) >= 10) {
@@ -120,7 +125,7 @@ abstract class Controller {
         $key = 'csrf_tokens/' . $form_name;
         $tokens = $this->session->get($key, []);
 
-        // 指定した値を配列で検索し見つかって、キーを返ってきた場合の処理
+        // 指定した値を配列で検索し見つかって、キー(添字)が返ってきた場合の処理
         if (false !== ($pos = array_search($token, $tokens, true))) {
             unset($token[$pos]);
             $this->session->set($key, $tokens);
