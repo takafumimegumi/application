@@ -9,6 +9,7 @@ abstract class Controller {
     protected $response;
     protected $session;
     protected $db_manager;
+    protected $auth_actions = [];
 
     public function __construct($application) {
         //（例）'AccountContoroller' → 'account'
@@ -31,11 +32,29 @@ abstract class Controller {
             $this->forward404();
         }
 
+        // ログインが必要なアクションかつ未ログインである場合の処理
+        if ($this->needsAuthentication($action) && !$this->session->isAuthenticated()) {
+            throw new UnauthorizedActionException();
+        }
+
         // 可変関数の仕組みを使ってアクションを特定し、存在すれば実行
         //（例）AccountController::signupAction
         $content = $this->$action_method($params);
 
         return $content;
+    }
+
+    public function needsAuthentication($action) {
+        // $auth_actionsがtrueの場合＝Controllerに定義されているすべてのアクションがログイン必須である場合
+        // もしくは、$auth_actions配列に指定のアクション名が格納されている場合
+        if (
+            $this->auth_actions === true || 
+            (is_array($this->auth_actions) && in_array($action, $this->auth_actions))
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     // ビューファイルの読み込み処理をラッピングしたメソッド
