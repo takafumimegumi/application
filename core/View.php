@@ -11,8 +11,8 @@ class View {
         $this->defaults = $defaults;
     }
 
-    // ページのタイトルはレイアウト側に出力されるが、実行するアクションによって変わってくる
     // レイアウトファイル側に値を設定するためのメソッド
+    // ページのタイトルはレイアウト側に出力されるが、実行するアクションによって変わってくる。そのような場合に使用する。
     public function setLayoutVar($name, $value) {
         $this->layout_variables[$name] = $value;
     }
@@ -34,7 +34,7 @@ class View {
         $content = ob_get_clean();
 
         // $_layout変数にレイアウトファイル名が指定されている場合の処理
-        // レイアウトファイル側のコンテンツは$_contentに格納され、適当な場所で$_contentを出力することで1つのHTMLとなり、再度$contentに格納される
+        // $_contentに先に読み込んだビューファイルの内容が格納され、適当な場所で$_contentを出力することで1つのHTMLとなり、再度$contentに格納される
         if ($_layout) {
             $content = $this->render(
                 $_layout, 

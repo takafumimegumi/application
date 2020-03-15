@@ -18,7 +18,7 @@ class DbManager {
         ], $params);
 
         $con = new PDO(
-            $params['dns'],
+            $params['dsn'],
             $params['user'],
             $params['password'],
             $params['options']
@@ -49,7 +49,7 @@ class DbManager {
             $name = $this->repository_connection_map[$repository_name];
             $con = $this->getConnection($name);
         } else {
-            $con->getConnection();
+            $con = $this->getConnection();
         }
 
         return $con;

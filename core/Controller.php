@@ -12,7 +12,7 @@ abstract class Controller {
     protected $auth_actions = [];
 
     public function __construct($application) {
-        //（例）'AccountContoroller' → 'account'
+        // （例）'AccountContoroller' → 'account'
         $this->controller_name = strtolower(substr(get_class($this), 0, -10));
 
         $this->application = $application;
@@ -23,22 +23,23 @@ abstract class Controller {
     }
 
     public function run($action, $params = []) {
-        //（例）signup
+        //（例1）signup （例2）user
         $this->action_name = $action;
 
-        //（例）signupAction
+        //（例1）signupAction （例2）userAction
         $action_method = $action . 'Action';
         if (!method_exists($this, $action_method)) {
             $this->forward404();
         }
 
-        // ログインが必要なアクションかつ未ログインである場合の処理
+        // ログインが必要なアクションの指定がある、かつ未ログインである場合の処理
         if ($this->needsAuthentication($action) && !$this->session->isAuthenticated()) {
             throw new UnauthorizedActionException();
         }
 
         // 可変関数の仕組みを使ってアクションを特定し、存在すれば実行
-        //（例）AccountController::signupAction
+        //（例）AccountController::signupAction(['controller' => 'account', '/account/signup', 'action' => 'signup', 'signup']);
+        //（例）StatusController::signupAction(['controller' => 'status', 'action' => 'user', '/user/taka', 'user_name' => 'taka', 'taka']);
         $content = $this->$action_method($params);
 
         return $content;
@@ -58,7 +59,9 @@ abstract class Controller {
     }
 
     // ビューファイルの読み込み処理をラッピングしたメソッド
+    // 第1引数に指定した変数がビューファイル内で利用可能になる
     protected function render($variables = [], $template = null, $layout = 'layout') {
+        // これらの値(配列)もViewクラスのrenderメソッド内でarray_mergeされた後、変数展開されるので、ビューファイル内で利用可能
         $defaults = [
             'request' => $this->request,
             'base_url' => $this->request->getBaseUrl(),
@@ -127,7 +130,7 @@ abstract class Controller {
 
         // 指定した値を配列で検索し見つかって、キー(添字)が返ってきた場合の処理
         if (false !== ($pos = array_search($token, $tokens, true))) {
-            unset($token[$pos]);
+            unset($tokens[$pos]);
             $this->session->set($key, $tokens);
 
             return true;
